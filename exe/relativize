@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'relativize'
+
+begin
+  cli = Relativize::CLI.new
+  converter = Relativize::Converter.new(cli.parse)
+  converter.convert
+rescue StandardError => e
+  puts e.message
+  exit(1)
+end
