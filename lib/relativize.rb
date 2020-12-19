@@ -80,6 +80,7 @@ module Relativize
       raise ArgumentError, "Path '#{libdir}' does not exist" unless File.exist?(libdir)
 
       @base = libdir
+      @count = 0
     end
 
     # Convert content
@@ -116,6 +117,7 @@ module Relativize
                     "require_relative '#{ROOT.relative_path_from(parent)}/#{requiree}'"
                   end
 
+        @count += 1
         "#{prefix}#{newline}#{suffix}"
       end
     end
@@ -136,6 +138,8 @@ module Relativize
         convert_content(Pathname.new(path), content)
         File.write(current_file, content, encoding: 'utf-8')
       end
+
+      puts "converted #{@count} files"
     end
   end
 end
