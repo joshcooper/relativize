@@ -1,0 +1,44 @@
+---
+name: RSpec tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: RSpec
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.5.x'
+
+      - name: Install bundler
+        run: |
+          gem install bundler
+          bundle config path vendor/bundle
+
+      - name: Cache gems
+        id: cache
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('lib/relativize/version.rb') }}-${{ hashFiles('Gemfile') }}-${{ hashFiles('relativize.gemspec') }}
+
+      - name: Install gems
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: bundle install --jobs 4 --retry 3
+
+      - name: Update gems
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: bundle update
+
+      - name: Run tests
+        run: bundle exec rspec -fd
